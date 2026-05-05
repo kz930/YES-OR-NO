@@ -81,7 +81,7 @@ function LoginForm() {
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         还没账号?{" "}
-        <Link href="/register" className="font-medium text-emerald-600 hover:underline">
+        <Link href="/register" className="font-semibold text-forest hover:underline">
           去注册
         </Link>
       </p>

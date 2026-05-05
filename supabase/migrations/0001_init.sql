@@ -25,10 +25,10 @@ create table categories (
 );
 
 insert into categories (slug, name, color_hex, display_order) values
-  ('qipashuo',   '奇葩说脑洞',   '#58CC02', 1),
-  ('philosophy', '经典思想实验', '#1CB0F6', 2),
-  ('either-or',  '二选一',       '#FFC800', 3),
-  ('internet',   '网络流传',     '#CE82FF', 4);
+  ('qipashuo',   '奇葩说脑洞',   '#DBF68F', 1),
+  ('philosophy', '经典思想实验', '#C7DFF9', 2),
+  ('either-or',  '二选一',       '#D7C7ED', 3),
+  ('internet',   '网络流传',     '#F9D9C3', 4);
 
 -- ============================================================
 -- questions

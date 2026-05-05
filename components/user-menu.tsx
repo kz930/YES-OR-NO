@@ -37,10 +37,10 @@ export function UserMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full">
-        <Avatar className="h-9 w-9">
+      <DropdownMenuTrigger className="outline-none focus-visible:ring-2 focus-visible:ring-jade rounded-full">
+        <Avatar className="h-9 w-9 ring-1 ring-border">
           {avatarUrl && <AvatarImage src={avatarUrl} alt={nickname} />}
-          <AvatarFallback className="bg-emerald-100 text-emerald-700 font-semibold">
+          <AvatarFallback className="bg-jade text-white font-display font-semibold">
             {nickname.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -49,7 +49,7 @@ export function UserMenu({
         <DropdownMenuLabel className="font-normal">
           <span className="block text-sm font-semibold">{nickname}</span>
           {isAdmin && (
-            <span className="text-xs text-emerald-600">管理员</span>
+            <span className="text-xs font-display italic text-forest">管理员</span>
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

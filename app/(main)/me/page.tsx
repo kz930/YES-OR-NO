@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function MePage() {
@@ -26,37 +25,59 @@ export default async function MePage() {
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-xl flex-1 px-4 py-8">
-      <Card className="p-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
+    <main className="mx-auto w-full max-w-xl flex-1 px-5 py-10">
+      <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
+        Profile · 个人中心
+      </p>
+
+      <section className="mt-3 rounded-3xl bg-card p-8 ring-1 ring-border/50">
+        <div className="flex items-center gap-5">
+          <Avatar className="h-16 w-16 ring-2 ring-cream-2">
             {profile?.avatar_url && (
               <AvatarImage src={profile.avatar_url} alt={profile.nickname} />
             )}
-            <AvatarFallback className="bg-emerald-100 text-emerald-700 text-2xl font-bold">
+            <AvatarFallback className="bg-jade text-2xl font-display font-bold text-white">
               {profile?.nickname?.charAt(0).toUpperCase() ?? "?"}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-xl font-bold">{profile?.nickname}</h2>
-            <p className="text-sm text-muted-foreground">{profile?.email}</p>
+            <h2 className="font-display text-2xl font-medium text-ink">
+              {profile?.nickname}
+            </h2>
+            <p className="text-sm text-ink-soft">{profile?.email}</p>
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3">
-          <Stat label="投票" value={voteCount ?? 0} />
-          <Stat label="论点" value={argumentCount ?? 0} />
+          <Stat label="Votes · 投票" value={voteCount ?? 0} accent="forest" />
+          <Stat label="Arguments · 论点" value={argumentCount ?? 0} accent="blossom" />
         </div>
-      </Card>
+      </section>
     </main>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number;
+  accent: "forest" | "blossom";
+}) {
   return (
-    <div className="rounded-2xl bg-muted/50 p-4 text-center">
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
+    <div className="rounded-2xl bg-cream-2 p-5 text-center">
+      <div
+        className={`font-display text-3xl font-bold ${
+          accent === "forest" ? "text-forest" : "text-mulberry"
+        }`}
+      >
+        {value}
+      </div>
+      <div className="mt-1 text-[11px] uppercase tracking-wider text-ink-soft">
+        {label}
+      </div>
     </div>
   );
 }

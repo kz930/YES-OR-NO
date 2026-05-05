@@ -103,7 +103,7 @@ export default function RegisterPage() {
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         已有账号?{" "}
-        <Link href="/login" className="font-medium text-emerald-600 hover:underline">
+        <Link href="/login" className="font-semibold text-forest hover:underline">
           去登录
         </Link>
       </p>

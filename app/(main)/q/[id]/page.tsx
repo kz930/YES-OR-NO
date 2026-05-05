@@ -34,30 +34,29 @@ export default async function QuestionPage({
   ]);
 
   if (!question || question.status !== "published") notFound();
-
-  // Already voted → jump to debate page
-  if (existingVote) {
-    redirect(`/q/${questionId}/debate`);
-  }
+  if (existingVote) redirect(`/q/${questionId}/debate`);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-12">
-      <div>
-        <h1 className="text-3xl font-extrabold leading-snug sm:text-4xl">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-12 px-5 py-12">
+      <article>
+        <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
+          The question
+        </p>
+        <h1 className="mt-3 font-display text-4xl font-medium leading-[1.2] text-ink sm:text-5xl">
           {question.title}
         </h1>
         {question.description && (
-          <p className="mt-4 text-base text-muted-foreground">
+          <p className="mt-5 text-base leading-relaxed text-ink-soft">
             {question.description}
           </p>
         )}
         {question.source && (
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-4 text-xs uppercase tracking-wider text-ink-soft">
             · {question.source}
             {question.source_detail ? ` · ${question.source_detail}` : ""}
           </p>
         )}
-      </div>
+      </article>
 
       <VoteButtons
         questionId={question.id}

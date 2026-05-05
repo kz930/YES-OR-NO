@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export default async function DebatePage({
   params,
@@ -36,29 +33,48 @@ export default async function DebatePage({
   if (!question) notFound();
 
   const mySide = vote?.current_side ?? null;
+  const myLabel = mySide === "a" ? question.side_a_label : mySide === "b" ? question.side_b_label : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-8">
-      <div>
-        <h1 className="text-xl font-bold leading-snug">{question.title}</h1>
-        {mySide && (
-          <Badge variant="secondary" className="mt-2">
-            你投了「{mySide === "a" ? question.side_a_label : question.side_b_label}」
-          </Badge>
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-5 py-10">
+      <article>
+        <h1 className="font-display text-2xl font-medium leading-snug text-ink sm:text-3xl">
+          {question.title}
+        </h1>
+        {mySide && myLabel && (
+          <p className="mt-3 text-sm text-ink-soft">
+            你投了{" "}
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 font-semibold ${
+                mySide === "a"
+                  ? "bg-forest text-white"
+                  : "bg-blossom text-mulberry"
+              }`}
+            >
+              <span className="font-display italic">{mySide === "a" ? "YES" : "NO"}</span>
+              <span>{myLabel}</span>
+            </span>
+          </p>
         )}
-      </div>
+      </article>
 
-      <Card className="p-8 text-center">
-        <p className="text-muted-foreground">
-          辩论页(双列论点墙)将在 Sprint 2 完成。
+      <section className="rounded-3xl bg-card p-10 text-center ring-1 ring-border/50">
+        <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
+          Coming in Sprint 2
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          目前你已经成功投票,数据已写入 votes 表。
+        <p className="mt-3 text-base text-ink-soft">
+          双列论点墙将在下个 Sprint 完成。
         </p>
-        <Button render={<Link href="/" />} variant="outline" className="mt-6">
+        <p className="mt-1 text-sm text-ink-soft">
+          目前你的投票已经写入数据库。
+        </p>
+        <Link
+          href="/"
+          className="mt-6 inline-flex h-11 items-center justify-center rounded-2xl bg-forest px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-2"
+        >
           回到首页
-        </Button>
-      </Card>
+        </Link>
+      </section>
     </main>
   );
 }

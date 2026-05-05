@@ -25,9 +25,12 @@ export default async function MainLayout({
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur">
-        <Link href="/" className="text-lg font-extrabold tracking-tight">
-          假设
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/60 bg-cream/80 px-5 backdrop-blur">
+        <Link
+          href="/"
+          className="font-display text-2xl font-bold tracking-tight text-forest leading-none"
+        >
+          YES <span className="italic font-normal text-ink-soft">or</span> NO
         </Link>
         <UserMenu
           nickname={profile?.nickname ?? "我"}
