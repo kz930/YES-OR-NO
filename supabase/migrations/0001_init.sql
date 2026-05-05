@@ -148,11 +148,18 @@ create index idx_suggestions_user
 -- Row Level Security policies
 -- ============================================================
 alter table profiles enable row level security;
+alter table categories enable row level security;
+alter table questions enable row level security;
 alter table votes enable row level security;
 alter table stance_changes enable row level security;
 alter table arguments enable row level security;
 alter table argument_likes enable row level security;
 alter table question_suggestions enable row level security;
+
+-- categories & questions: publicly readable (anyone, even anon, can browse)
+create policy "categories_read_all" on categories for select using (true);
+create policy "questions_read_published" on questions for select
+  using (status = 'published');
 
 -- profiles: anyone can read; user can update their own row (except is_admin)
 create policy "profiles_read_all" on profiles for select using (true);
