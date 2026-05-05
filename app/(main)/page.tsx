@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
-const CATEGORY_PALETTE: Record<string, { bg: string; text: string; emoji: string }> = {
-  qipashuo:   { bg: "#DBF68F", text: "#1F2A24", emoji: "🎤" },
-  philosophy: { bg: "#C7DFF9", text: "#1F2A24", emoji: "🧠" },
-  "either-or": { bg: "#D7C7ED", text: "#1F2A24", emoji: "🔀" },
-  internet:   { bg: "#F9D9C3", text: "#1F2A24", emoji: "💭" },
-};
-
 export default async function HomePage() {
   const supabase = await createClient();
 
@@ -29,21 +22,24 @@ export default async function HomePage() {
     question = fallback?.[0];
   }
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id, slug, name")
-    .order("display_order");
-
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-5 py-10">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-5 py-10">
       <section>
-        <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
-          Today&rsquo;s prompt · 今日一题
-        </p>
+        <div className="flex items-baseline justify-between">
+          <p className="text-xs uppercase tracking-[0.2em] text-ink-soft">
+            今天聊聊 · Today
+          </p>
+          <Link
+            href="/explore"
+            className="text-xs font-medium text-forest hover:underline"
+          >
+            浏览全部 →
+          </Link>
+        </div>
 
         {question ? (
           <article className="mt-3 rounded-[28px] bg-card p-8 shadow-[0_2px_24px_-8px_rgba(31,42,36,0.08)] ring-1 ring-border/50 sm:p-10">
-            <h2 className="font-display text-3xl font-medium leading-[1.25] text-ink sm:text-4xl">
+            <h2 className="text-[28px] font-semibold leading-[1.25] -tracking-[0.01em] text-ink sm:text-[32px]">
               {question.title}
             </h2>
             {question.source && (
@@ -56,17 +52,21 @@ export default async function HomePage() {
             <div className="mt-10 grid grid-cols-2 gap-3">
               <Link
                 href={`/q/${question.id}?side=a`}
-                className="group flex h-16 items-center justify-center rounded-2xl bg-forest text-lg font-bold tracking-wide text-white transition-all hover:bg-forest-2 active:scale-[0.97]"
+                className="flex h-16 flex-col items-center justify-center rounded-2xl bg-forest text-white transition-all hover:bg-forest-2 active:scale-[0.97]"
               >
-                <span className="font-display italic text-xl mr-2">YES</span>
-                <span className="text-sm font-semibold">{question.side_a_label}</span>
+                <span className="text-base font-bold tracking-tight">YES</span>
+                <span className="text-[11px] font-medium opacity-90">
+                  {question.side_a_label}
+                </span>
               </Link>
               <Link
                 href={`/q/${question.id}?side=b`}
-                className="group flex h-16 items-center justify-center rounded-2xl bg-blossom text-lg font-bold tracking-wide text-mulberry transition-all hover:bg-blossom-2 hover:text-white active:scale-[0.97]"
+                className="flex h-16 flex-col items-center justify-center rounded-2xl bg-blossom text-mulberry transition-all hover:bg-blossom-2 hover:text-white active:scale-[0.97]"
               >
-                <span className="font-display italic text-xl mr-2">NO</span>
-                <span className="text-sm font-semibold">{question.side_b_label}</span>
+                <span className="text-base font-bold tracking-tight">NO</span>
+                <span className="text-[11px] font-medium opacity-90">
+                  {question.side_b_label}
+                </span>
               </Link>
             </div>
           </article>
@@ -77,33 +77,22 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section>
-        <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
-          Browse · 分类
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          {categories?.map((cat) => {
-            const palette = CATEGORY_PALETTE[cat.slug] ?? {
-              bg: "#92C3A5",
-              text: "#1F2A24",
-              emoji: "✨",
-            };
-            return (
-              <Link
-                key={cat.id}
-                href={`/explore?category=${cat.slug}`}
-                className="group flex flex-col justify-between rounded-3xl p-5 h-32 transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
-                style={{ backgroundColor: palette.bg, color: palette.text }}
-              >
-                <span className="text-2xl">{palette.emoji}</span>
-                <span className="font-display text-lg font-medium leading-tight">
-                  {cat.name}
-                </span>
-              </Link>
-            );
-          })}
+      <Link
+        href="/suggest"
+        className="group flex items-center justify-between rounded-2xl bg-cream-2 p-5 transition-colors hover:bg-jade/30"
+      >
+        <div>
+          <p className="text-sm font-semibold text-ink">
+            有想问的脑洞?
+          </p>
+          <p className="mt-0.5 text-xs text-ink-soft">
+            提议一道题,通过审核后会加入题库 · 每天 3 题上限
+          </p>
         </div>
-      </section>
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-forest text-lg font-bold text-white transition-transform group-hover:scale-110">
+          +
+        </span>
+      </Link>
     </main>
   );
 }

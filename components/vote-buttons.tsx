@@ -55,24 +55,24 @@ export function VoteButtons({
       <button
         onClick={() => vote("a")}
         disabled={submitting !== null}
-        className="group flex h-20 flex-col items-center justify-center gap-1 rounded-2xl bg-forest text-white transition-all hover:bg-forest-2 active:scale-[0.97] disabled:opacity-70"
+        className="flex h-20 flex-col items-center justify-center gap-1 rounded-2xl bg-forest text-white transition-all hover:bg-forest-2 active:scale-[0.97] disabled:opacity-70"
       >
-        <span className="font-display text-2xl italic font-medium">
+        <span className="text-xl font-bold tracking-tight">
           {submitting === "a" ? "..." : "YES"}
         </span>
-        <span className="text-sm font-semibold tracking-wide">
+        <span className="text-xs font-medium opacity-90">
           {sideALabel}
         </span>
       </button>
       <button
         onClick={() => vote("b")}
         disabled={submitting !== null}
-        className="group flex h-20 flex-col items-center justify-center gap-1 rounded-2xl bg-blossom text-mulberry transition-all hover:bg-blossom-2 hover:text-white active:scale-[0.97] disabled:opacity-70"
+        className="flex h-20 flex-col items-center justify-center gap-1 rounded-2xl bg-blossom text-mulberry transition-all hover:bg-blossom-2 hover:text-white active:scale-[0.97] disabled:opacity-70"
       >
-        <span className="font-display text-2xl italic font-medium">
+        <span className="text-xl font-bold tracking-tight">
           {submitting === "b" ? "..." : "NO"}
         </span>
-        <span className="text-sm font-semibold tracking-wide">
+        <span className="text-xs font-medium opacity-90">
           {sideBLabel}
         </span>
       </button>

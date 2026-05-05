@@ -13,7 +13,7 @@ export default async function MePage() {
     .eq("id", user!.id)
     .single();
 
-  const [{ count: voteCount }, { count: argumentCount }] = await Promise.all([
+  const [{ count: voteCount }, { count: argumentCount }, { count: suggestionCount }] = await Promise.all([
     supabase
       .from("votes")
       .select("*", { count: "exact", head: true })
@@ -22,11 +22,15 @@ export default async function MePage() {
       .from("arguments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user!.id),
+    supabase
+      .from("question_suggestions")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user!.id),
   ]);
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-5 py-10">
-      <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
+      <p className="text-xs uppercase tracking-[0.2em] text-ink-soft">
         Profile · 个人中心
       </p>
 
@@ -36,21 +40,22 @@ export default async function MePage() {
             {profile?.avatar_url && (
               <AvatarImage src={profile.avatar_url} alt={profile.nickname} />
             )}
-            <AvatarFallback className="bg-jade text-2xl font-display font-bold text-white">
+            <AvatarFallback className="bg-jade text-2xl font-bold text-white">
               {profile?.nickname?.charAt(0).toUpperCase() ?? "?"}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="font-display text-2xl font-medium text-ink">
+            <h2 className="text-2xl font-semibold -tracking-[0.01em] text-ink">
               {profile?.nickname}
             </h2>
             <p className="text-sm text-ink-soft">{profile?.email}</p>
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          <Stat label="Votes · 投票" value={voteCount ?? 0} accent="forest" />
-          <Stat label="Arguments · 论点" value={argumentCount ?? 0} accent="blossom" />
+        <div className="mt-6 grid grid-cols-3 gap-3">
+          <Stat label="投票" value={voteCount ?? 0} accent="forest" />
+          <Stat label="论点" value={argumentCount ?? 0} accent="mulberry" />
+          <Stat label="提议" value={suggestionCount ?? 0} accent="forest" />
         </div>
       </section>
     </main>
@@ -64,18 +69,18 @@ function Stat({
 }: {
   label: string;
   value: number;
-  accent: "forest" | "blossom";
+  accent: "forest" | "mulberry";
 }) {
   return (
-    <div className="rounded-2xl bg-cream-2 p-5 text-center">
+    <div className="rounded-2xl bg-cream-2 p-4 text-center">
       <div
-        className={`font-display text-3xl font-bold ${
+        className={`text-2xl font-bold -tracking-[0.02em] ${
           accent === "forest" ? "text-forest" : "text-mulberry"
         }`}
       >
         {value}
       </div>
-      <div className="mt-1 text-[11px] uppercase tracking-wider text-ink-soft">
+      <div className="mt-0.5 text-[11px] tracking-wider text-ink-soft">
         {label}
       </div>
     </div>

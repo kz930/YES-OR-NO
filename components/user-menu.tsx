@@ -40,7 +40,7 @@ export function UserMenu({
       <DropdownMenuTrigger className="outline-none focus-visible:ring-2 focus-visible:ring-jade rounded-full">
         <Avatar className="h-9 w-9 ring-1 ring-border">
           {avatarUrl && <AvatarImage src={avatarUrl} alt={nickname} />}
-          <AvatarFallback className="bg-jade text-white font-display font-semibold">
+          <AvatarFallback className="bg-jade text-white font-bold">
             {nickname.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -49,7 +49,7 @@ export function UserMenu({
         <DropdownMenuLabel className="font-normal">
           <span className="block text-sm font-semibold">{nickname}</span>
           {isAdmin && (
-            <span className="text-xs font-display italic text-forest">管理员</span>
+            <span className="text-xs font-semibold text-forest">管理员</span>
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -57,7 +57,10 @@ export function UserMenu({
           个人中心
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/suggest")}>
-          提议新题
+          提一题
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/me/suggestions")}>
+          我提议的题
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem onClick={() => router.push("/admin/suggestions")}>

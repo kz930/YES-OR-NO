@@ -39,10 +39,10 @@ export default async function QuestionPage({
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-12 px-5 py-12">
       <article>
-        <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
+        <p className="text-xs uppercase tracking-[0.2em] text-ink-soft">
           The question
         </p>
-        <h1 className="mt-3 font-display text-4xl font-medium leading-[1.2] text-ink sm:text-5xl">
+        <h1 className="mt-3 text-[34px] font-semibold leading-[1.2] -tracking-[0.015em] text-ink sm:text-[42px]">
           {question.title}
         </h1>
         {question.description && (

@@ -7,10 +7,10 @@ export default function AuthLayout({
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-12 text-center">
-          <h1 className="font-display text-5xl font-bold tracking-tight text-forest leading-none">
-            YES <span className="italic font-normal text-ink-soft">or</span> NO
+          <h1 className="text-4xl font-bold tracking-tight text-forest leading-none">
+            YES OR NO
           </h1>
-          <p className="mt-4 text-sm text-ink-soft">
+          <p className="mt-3 text-sm text-ink-soft">
             5 分钟 · 一道脑洞题 · 先选边再开战
           </p>
         </div>

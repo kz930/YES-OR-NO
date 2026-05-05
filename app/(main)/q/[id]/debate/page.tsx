@@ -38,7 +38,7 @@ export default async function DebatePage({
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-5 py-10">
       <article>
-        <h1 className="font-display text-2xl font-medium leading-snug text-ink sm:text-3xl">
+        <h1 className="text-2xl font-semibold leading-snug -tracking-[0.01em] text-ink sm:text-3xl">
           {question.title}
         </h1>
         {mySide && myLabel && (
@@ -51,7 +51,7 @@ export default async function DebatePage({
                   : "bg-blossom text-mulberry"
               }`}
             >
-              <span className="font-display italic">{mySide === "a" ? "YES" : "NO"}</span>
+              <span className="font-bold tracking-tight">{mySide === "a" ? "YES" : "NO"}</span>
               <span>{myLabel}</span>
             </span>
           </p>
@@ -59,7 +59,7 @@ export default async function DebatePage({
       </article>
 
       <section className="rounded-3xl bg-card p-10 text-center ring-1 ring-border/50">
-        <p className="font-display text-xs uppercase tracking-[0.25em] text-ink-soft">
+        <p className="text-xs uppercase tracking-[0.2em] text-ink-soft">
           Coming in Sprint 2
         </p>
         <p className="mt-3 text-base text-ink-soft">
