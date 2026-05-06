@@ -97,9 +97,9 @@ export default async function MePage() {
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-2.5">
-          <Stat label="投票" value={voteCount ?? 0} bg="#DBF68F" />
-          <Stat label="评论" value={argumentCount ?? 0} bg="#F7C4D8" />
-          <Stat label="提议" value={suggestionCount ?? 0} bg="#FFCE55" />
+          <Stat label="投票" value={voteCount ?? 0} bg="#A8C19F" />
+          <Stat label="评论" value={argumentCount ?? 0} bg="#E8B59F" />
+          <Stat label="提议" value={suggestionCount ?? 0} bg="#C8A456" />
         </div>
       </section>
 

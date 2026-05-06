@@ -5,30 +5,32 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ========================================================
-   YES OR NO — palette
-   Earthy greens + warm pastels. Inspired by user moodboard.
+   YES OR NO — Editorial earth-tone palette
+   Sage + terracotta + warm neutrals. Like a printed magazine.
    ======================================================== */
 @theme {
-  /* Earth */
-  --color-cream:     #F3F6EB;  /* page bg */
-  --color-cream-2:   #ECEEDC;  /* muted bg */
-  --color-forest:    #568366;  /* primary (YES) */
-  --color-forest-2:  #436B53;  /* primary hover */
-  --color-jade:      #92C3A5;  /* secondary green */
-  --color-sour:      #DBF68F;  /* accent yellow-green */
-  --color-sunflower: #FFCE55;  /* accent yellow */
+  /* Neutrals (page bg + cards) */
+  --color-cream:     #F8F4ED;  /* warm off-white page bg */
+  --color-cream-2:   #F2EBE0;  /* muted bg / chips */
 
-  /* Soft pastels */
-  --color-blossom:   #F7C4D8;  /* NO button */
-  --color-blossom-2: #E89BAC;  /* destructive */
-  --color-mulberry:  #6B2D40;  /* text on blossom */
-  --color-sky:       #C7DFF9;
-  --color-lavender:  #D7C7ED;
-  --color-peach:     #F9D9C3;
+  /* Brand greens (YES side anchor) */
+  --color-forest:    #4A6B4A;  /* primary (YES) — deep sage */
+  --color-forest-2:  #3A5739;  /* primary hover */
+  --color-jade:      #A8C19F;  /* lighter sage / category */
+  --color-sour:      #D4B898;  /* sand / category */
+  --color-sunflower: #C8A456;  /* warm gold accent */
+
+  /* Warm contrast (NO side + accents) */
+  --color-blossom:   #E8B59F;  /* NO button bg — peach clay */
+  --color-blossom-2: #C26B4D;  /* destructive / NO hover — terracotta */
+  --color-mulberry:  #5D3520;  /* dark text on blossom */
+  --color-sky:       #A8C19F;  /* category — reuse sage */
+  --color-lavender:  #C9A8B5;  /* category — dusty mauve */
+  --color-peach:     #D4B898;  /* category — reuse sand */
 
   /* Ink */
-  --color-ink:       #1F2A24;  /* primary text */
-  --color-ink-soft:  #56685C;  /* muted text */
+  --color-ink:       #1A1612;  /* warm black text */
+  --color-ink-soft:  #6B5F52;  /* warm gray-brown muted text */
 }
 
 @theme inline {
@@ -77,38 +79,38 @@
 }
 
 :root {
-  --background: #F3F6EB;
-  --foreground: #1F2A24;
+  --background: #F8F4ED;
+  --foreground: #1A1612;
   --card: #FFFFFF;
-  --card-foreground: #1F2A24;
+  --card-foreground: #1A1612;
   --popover: #FFFFFF;
-  --popover-foreground: #1F2A24;
-  --primary: #568366;
+  --popover-foreground: #1A1612;
+  --primary: #4A6B4A;
   --primary-foreground: #FFFFFF;
-  --secondary: #ECEEDC;
-  --secondary-foreground: #1F2A24;
-  --muted: #ECEEDC;
-  --muted-foreground: #56685C;
-  --accent: #FFCE55;
-  --accent-foreground: #1F2A24;
-  --destructive: #E89BAC;
-  --border: #DDE2D0;
-  --input: #DDE2D0;
-  --ring: #92C3A5;
-  --chart-1: #568366;
-  --chart-2: #92C3A5;
-  --chart-3: #DBF68F;
-  --chart-4: #FFCE55;
-  --chart-5: #F7C4D8;
+  --secondary: #F2EBE0;
+  --secondary-foreground: #1A1612;
+  --muted: #F2EBE0;
+  --muted-foreground: #6B5F52;
+  --accent: #C8A456;
+  --accent-foreground: #1A1612;
+  --destructive: #C26B4D;
+  --border: #E8E0D2;
+  --input: #E8E0D2;
+  --ring: #A8C19F;
+  --chart-1: #4A6B4A;
+  --chart-2: #A8C19F;
+  --chart-3: #D4B898;
+  --chart-4: #C8A456;
+  --chart-5: #C26B4D;
   --radius: 0.625rem;
-  --sidebar: #F3F6EB;
-  --sidebar-foreground: #1F2A24;
-  --sidebar-primary: #568366;
+  --sidebar: #F8F4ED;
+  --sidebar-foreground: #1A1612;
+  --sidebar-primary: #4A6B4A;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #ECEEDC;
-  --sidebar-accent-foreground: #1F2A24;
-  --sidebar-border: #DDE2D0;
-  --sidebar-ring: #92C3A5;
+  --sidebar-accent: #F2EBE0;
+  --sidebar-accent-foreground: #1A1612;
+  --sidebar-border: #E8E0D2;
+  --sidebar-ring: #A8C19F;
 }
 
 @layer base {
