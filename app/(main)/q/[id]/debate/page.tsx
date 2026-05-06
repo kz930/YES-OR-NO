@@ -40,12 +40,13 @@ export default async function DebatePage({
       .eq("user_id", user!.id)
       .eq("question_id", questionId)
       .maybeSingle(),
+    // NOTE: is_anonymous omitted from explicit select to dodge a stale
+    // PostgREST schema cache after migration 0009. We read the whole row
+    // with `*` so the column comes through if the cache is fresh, and
+    // fall back to false if the property is undefined.
     supabase
       .from("arguments")
-      .select(
-        `id, content, side, likes_count, is_anonymous, created_at,
-         profiles(nickname, avatar_url)`
-      )
+      .select(`*, profiles(nickname, avatar_url)`)
       .eq("question_id", questionId)
       .order(orderByLikes ? "likes_count" : "created_at", { ascending: false })
       .limit(100),
