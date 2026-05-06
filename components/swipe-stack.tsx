@@ -187,11 +187,16 @@ function SwipeCard({
         rotate: x.get() > 0 ? 30 : x.get() < 0 ? -30 : 0,
         transition: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
       }}
-      className={`absolute inset-0 select-none rounded-[28px] bg-gradient-to-br from-blossom/30 via-card to-sky/30 p-7 shadow-[0_4px_24px_-8px_rgba(31,42,36,0.18)] ring-1 ring-border/40 ${
+      className={`absolute inset-0 select-none overflow-hidden rounded-[28px] bg-card p-7 shadow-[0_4px_24px_-8px_rgba(31,42,36,0.18)] ring-1 ring-border/40 ${
         isTop ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"
       }`}
       {...(isTop ? tappable : {})}
     >
+      {/* Decorative gradient overlay (opaque card behind, this just tints) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blossom/45 via-transparent to-sky/45"
+      />
       {/* Floating label overlays */}
       {isTop && (
         <>
@@ -214,7 +219,7 @@ function SwipeCard({
         </>
       )}
 
-      <div className="flex h-full flex-col">
+      <div className="relative flex h-full flex-col">
         {card.categoryName && (
           <span className="self-start rounded-full bg-card/70 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-soft backdrop-blur">
             {card.categoryName}
