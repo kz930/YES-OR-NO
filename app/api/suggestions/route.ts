@@ -8,6 +8,7 @@ interface Body {
   side_a_label?: string;
   side_b_label?: string;
   source?: string | null;
+  is_anonymous?: boolean;
 }
 
 export async function POST(req: NextRequest) {
@@ -23,8 +24,8 @@ export async function POST(req: NextRequest) {
   if (!body) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
-  if (!body.title || body.title.length < 10 || body.title.length > 80) {
-    return NextResponse.json({ error: "题面需要 10-80 字" }, { status: 400 });
+  if (!body.title || body.title.length < 10 || body.title.length > 200) {
+    return NextResponse.json({ error: "题面需要 10-200 字" }, { status: 400 });
   }
   if (!body.category_id) {
     return NextResponse.json({ error: "请选择分类" }, { status: 400 });
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
     side_a_label: body.side_a_label?.trim() || "支持",
     side_b_label: body.side_b_label?.trim() || "反对",
     source: body.source ?? null,
+    is_anonymous: body.is_anonymous === true,
   });
 
   if (error) {

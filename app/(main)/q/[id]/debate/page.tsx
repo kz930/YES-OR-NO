@@ -43,7 +43,7 @@ export default async function DebatePage({
     supabase
       .from("arguments")
       .select(
-        `id, content, side, likes_count, created_at,
+        `id, content, side, likes_count, is_anonymous, created_at,
          profiles(nickname, avatar_url)`
       )
       .eq("question_id", questionId)
@@ -146,10 +146,11 @@ export default async function DebatePage({
             content: a.content,
             side: a.side,
             likes_count: a.likes_count,
+            is_anonymous: a.is_anonymous ?? false,
             created_at: a.created_at,
             // Supabase types FK joins as either array or object
             nickname:
-              (Array.isArray(a.profiles) ? a.profiles[0]?.nickname : (a.profiles as { nickname?: string } | null)?.nickname) ?? "匿名",
+              (Array.isArray(a.profiles) ? a.profiles[0]?.nickname : (a.profiles as { nickname?: string } | null)?.nickname) ?? "用户",
             avatar_url:
               (Array.isArray(a.profiles) ? a.profiles[0]?.avatar_url : (a.profiles as { avatar_url?: string | null } | null)?.avatar_url) ?? null,
             initiallyLiked: likedArgs.has(a.id),

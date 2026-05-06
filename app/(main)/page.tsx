@@ -87,12 +87,12 @@ export default async function HomePage() {
       <div className="grid gap-3 sm:grid-cols-2">
         <Link
           href="/swipe"
-          className="group flex items-center justify-between rounded-2xl bg-gradient-to-br from-blossom/40 to-sky/40 p-5 transition-transform hover:-translate-y-0.5"
+          className="group flex items-center justify-between rounded-2xl bg-cream-2 p-5 transition-colors hover:bg-jade/30"
         >
           <div>
             <p className="text-sm font-semibold text-ink">随便逛</p>
             <p className="mt-0.5 text-xs text-ink-soft">
-              一张张滑过去 · Tinder 模式
+              一张张滑过去
             </p>
           </div>
           <span className="text-2xl">🃏</span>

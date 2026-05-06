@@ -65,6 +65,7 @@ export interface Argument {
   side: Side;
   content: string;
   likes_count: number;
+  is_anonymous: boolean;
   created_at: string;
 }
 
@@ -81,6 +82,7 @@ export interface QuestionSuggestion {
   reviewer_note: string | null;
   reviewer_id: string | null;
   approved_question_id: number | null;
+  is_anonymous: boolean;
   created_at: string;
   reviewed_at: string | null;
 }

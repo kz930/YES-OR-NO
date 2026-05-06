@@ -83,6 +83,7 @@ create table arguments (
   side char(1) not null check (side in ('a', 'b')),
   content text not null check (char_length(content) <= 200),
   likes_count int default 0 not null,
+  is_anonymous boolean default false not null,
   created_at timestamptz default now() not null
 );
 
@@ -121,7 +122,7 @@ create trigger trg_argument_likes_bump
 create table question_suggestions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade not null,
-  title text not null check (char_length(title) between 10 and 80),
+  title text not null check (char_length(title) between 10 and 200),
   description text check (char_length(description) <= 200),
   category_id int references categories(id),
   side_a_label text default '支持' not null,
@@ -132,6 +133,7 @@ create table question_suggestions (
   reviewer_note text,
   reviewer_id uuid references profiles(id),
   approved_question_id int references questions(id),
+  is_anonymous boolean default false not null,
   created_at timestamptz default now() not null,
   reviewed_at timestamptz
 );

@@ -11,7 +11,9 @@ export async function POST(
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const body = (await req.json().catch(() => null)) as { content?: string } | null;
+  const body = (await req.json().catch(() => null)) as
+    | { content?: string; is_anonymous?: boolean }
+    | null;
   if (!body?.content || body.content.trim().length === 0) {
     return NextResponse.json({ error: "评论不能为空" }, { status: 400 });
   }
@@ -47,6 +49,7 @@ export async function POST(
     question_id: questionId,
     side: vote.current_side,
     content: body.content.trim(),
+    is_anonymous: body.is_anonymous === true,
   });
 
   if (error) {

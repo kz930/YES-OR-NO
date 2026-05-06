@@ -14,6 +14,9 @@ interface Category {
   name: string;
 }
 
+const TITLE_MIN = 10;
+const TITLE_MAX = 200;
+
 export function SuggestForm({
   categories,
   remaining,
@@ -30,14 +33,15 @@ export function SuggestForm({
   const [sideA, setSideA] = useState("支持");
   const [sideB, setSideB] = useState("反对");
   const [source, setSource] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const disabled = remaining === 0 || submitting;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (title.length < 10 || title.length > 80) {
-      toast.error("题面需要 10-80 个字");
+    if (title.length < TITLE_MIN || title.length > TITLE_MAX) {
+      toast.error(`题面需要 ${TITLE_MIN}-${TITLE_MAX} 个字`);
       return;
     }
     if (!categoryId) {
@@ -56,6 +60,7 @@ export function SuggestForm({
         side_a_label: sideA || "支持",
         side_b_label: sideB || "反对",
         source: source || null,
+        is_anonymous: isAnonymous,
       }),
     });
     setSubmitting(false);
@@ -87,12 +92,12 @@ export function SuggestForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="title">题面 <span className="text-ink-soft">(10-80 字)</span></Label>
+        <Label htmlFor="title">题面 <span className="text-ink-soft">({TITLE_MIN}-{TITLE_MAX} 字)</span></Label>
         <Textarea
           id="title"
           required
-          minLength={10}
-          maxLength={80}
+          minLength={TITLE_MIN}
+          maxLength={TITLE_MAX}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="例如:如果可以一键消除所有遗憾,你愿意按吗?"
@@ -101,7 +106,7 @@ export function SuggestForm({
           disabled={disabled}
         />
         <p className="text-right text-xs text-ink-soft">
-          {title.length}/80
+          {title.length}/{TITLE_MAX}
         </p>
       </div>
 
@@ -174,6 +179,20 @@ export function SuggestForm({
           disabled={disabled}
         />
       </div>
+
+      <label className="flex items-center gap-2.5 rounded-xl bg-cream-2 px-3.5 py-2.5 text-sm">
+        <input
+          type="checkbox"
+          checked={isAnonymous}
+          onChange={(e) => setIsAnonymous(e.target.checked)}
+          disabled={disabled}
+          className="h-4 w-4 accent-forest"
+        />
+        <span className="flex-1 text-ink">匿名提议</span>
+        <span className="text-xs text-ink-soft">
+          不显示昵称
+        </span>
+      </label>
 
       <Button
         type="submit"

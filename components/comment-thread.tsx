@@ -16,6 +16,7 @@ interface CommentRow {
   created_at: string;
   nickname: string;
   avatar_url: string | null;
+  is_anonymous: boolean;
   initiallyLiked: boolean;
 }
 
@@ -38,6 +39,7 @@ export function CommentThread({
 }: Props) {
   const router = useRouter();
   const [draft, setDraft] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -52,7 +54,7 @@ export function CommentThread({
     const res = await fetch(`/api/questions/${questionId}/arguments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: draft.trim() }),
+      body: JSON.stringify({ content: draft.trim(), is_anonymous: isAnonymous }),
     });
     setSubmitting(false);
 
@@ -63,6 +65,7 @@ export function CommentThread({
     }
 
     setDraft("");
+    setIsAnonymous(false);
     router.refresh();
   }
 
@@ -83,15 +86,27 @@ export function CommentThread({
         className="rounded-2xl bg-card p-4 ring-1 ring-border/50"
       >
         <p className="text-[11px] text-ink-soft">
-          以{" "}
-          <span
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-              mySide === "a" ? "bg-forest text-white" : "bg-blossom text-mulberry"
-            }`}
-          >
-            {mySide === "a" ? "YES" : "NO"} · {myLabel}
-          </span>{" "}
-          的身份发表
+          {isAnonymous ? (
+            <>
+              以{" "}
+              <span className="inline-flex items-center gap-1 rounded-full bg-cream-2 px-2 py-0.5 text-[10px] font-bold text-ink-soft">
+                匿名
+              </span>{" "}
+              发表(YES/NO 立场仍会显示)
+            </>
+          ) : (
+            <>
+              以{" "}
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                  mySide === "a" ? "bg-forest text-white" : "bg-blossom text-mulberry"
+                }`}
+              >
+                {mySide === "a" ? "YES" : "NO"} · {myLabel}
+              </span>{" "}
+              的身份发表
+            </>
+          )}
         </p>
         <Textarea
           value={draft}
@@ -103,16 +118,28 @@ export function CommentThread({
           disabled={submitting}
         />
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-[11px] text-ink-soft">
-            {draft.length}/200
-          </span>
-          <button
-            type="submit"
-            disabled={!draft.trim() || submitting}
-            className="rounded-full bg-forest px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-forest-2 disabled:bg-cream-2 disabled:text-ink-soft"
-          >
-            {submitting ? "发送中…" : "发送"}
-          </button>
+          <label className="flex cursor-pointer items-center gap-1.5 text-[11px] text-ink-soft">
+            <input
+              type="checkbox"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              disabled={submitting}
+              className="h-3.5 w-3.5 accent-forest"
+            />
+            匿名发表
+          </label>
+          <div className="flex items-center gap-2.5">
+            <span className="text-[11px] text-ink-soft">
+              {draft.length}/200
+            </span>
+            <button
+              type="submit"
+              disabled={!draft.trim() || submitting}
+              className="rounded-full bg-forest px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-forest-2 disabled:bg-cream-2 disabled:text-ink-soft"
+            >
+              {submitting ? "发送中…" : "发送"}
+            </button>
+          </div>
         </div>
       </form>
 
@@ -171,22 +198,35 @@ function CommentItem({ comment }: { comment: CommentRow }) {
     }
   }
 
+  const displayName = comment.is_anonymous ? "匿名" : comment.nickname;
+  const showAvatar = !comment.is_anonymous && comment.avatar_url;
+
   return (
     <li className="rounded-2xl bg-card p-4 ring-1 ring-border/50">
       <div className="flex items-start gap-3">
         <Avatar className="h-9 w-9 shrink-0">
-          {comment.avatar_url && (
-            <AvatarImage src={comment.avatar_url} alt={comment.nickname} />
+          {showAvatar && (
+            <AvatarImage src={comment.avatar_url!} alt={displayName} />
           )}
-          <AvatarFallback className="bg-jade text-sm font-bold text-white">
-            {comment.nickname.charAt(0).toUpperCase()}
+          <AvatarFallback
+            className={`text-sm font-bold ${
+              comment.is_anonymous
+                ? "bg-cream-2 text-ink-soft"
+                : "bg-jade text-white"
+            }`}
+          >
+            {comment.is_anonymous ? "匿" : displayName.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold text-ink">
-              {comment.nickname}
+            <span
+              className={`text-sm font-semibold ${
+                comment.is_anonymous ? "text-ink-soft italic" : "text-ink"
+              }`}
+            >
+              {displayName}
             </span>
             <span
               className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-bold tracking-wider ${
