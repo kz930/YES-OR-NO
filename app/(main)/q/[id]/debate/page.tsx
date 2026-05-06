@@ -61,7 +61,7 @@ export default async function DebatePage({
       supabase
         .from("questions")
         .select(
-          "id, title, side_a_label, side_b_label, likes_count, votes_count, arguments_count"
+          "id, title, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count, arguments_count"
         )
         .eq("id", questionId)
         .single(),
@@ -84,16 +84,12 @@ export default async function DebatePage({
   const mySide = vote?.current_side ?? null;
   const myLabel = mySide === "a" ? question.side_a_label : mySide === "b" ? question.side_b_label : null;
 
-  // Compute YES/NO vote split for the bar
-  const { count: yesCount } = await supabase
-    .from("votes")
-    .select("*", { count: "exact", head: true })
-    .eq("question_id", questionId)
-    .eq("current_side", "a");
-
+  // YES/NO split: read denormalized columns (votes RLS is self-only,
+  // so per-row count(*) would always return just the viewer's vote).
   const total = question.votes_count ?? 0;
-  const yesPct = total > 0 ? Math.round(((yesCount ?? 0) / total) * 100) : 50;
-  const noPct = 100 - yesPct;
+  const yesCount = question.yes_votes_count ?? 0;
+  const yesPct = total > 0 ? Math.round((yesCount / total) * 100) : 50;
+  const noPct = total > 0 ? 100 - yesPct : 50;
 
   // My liked argument ids
   const argIds = (arguments_ ?? []).map((a) => a.id);
