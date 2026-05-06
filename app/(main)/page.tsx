@@ -84,22 +84,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Link
-        href="/suggest"
-        className="group flex items-center justify-between rounded-2xl bg-cream-2 p-5 transition-colors hover:bg-jade/30"
-      >
-        <div>
-          <p className="text-sm font-semibold text-ink">
-            有想问的脑洞?
-          </p>
-          <p className="mt-0.5 text-xs text-ink-soft">
-            提议一道题,通过审核后会加入题库 · 每天 3 题上限
-          </p>
-        </div>
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-forest text-lg font-bold text-white transition-transform group-hover:scale-110">
-          +
-        </span>
-      </Link>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/swipe"
+          className="group flex items-center justify-between rounded-2xl bg-gradient-to-br from-blossom/40 to-sky/40 p-5 transition-transform hover:-translate-y-0.5"
+        >
+          <div>
+            <p className="text-sm font-semibold text-ink">随便逛</p>
+            <p className="mt-0.5 text-xs text-ink-soft">
+              一张张滑过去 · Tinder 模式
+            </p>
+          </div>
+          <span className="text-2xl">🃏</span>
+        </Link>
+        <Link
+          href="/suggest"
+          className="group flex items-center justify-between rounded-2xl bg-cream-2 p-5 transition-colors hover:bg-jade/30"
+        >
+          <div>
+            <p className="text-sm font-semibold text-ink">
+              有想问的脑洞?
+            </p>
+            <p className="mt-0.5 text-xs text-ink-soft">
+              提议一道题 · 每天 3 题上限
+            </p>
+          </div>
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-forest text-lg font-bold text-white transition-transform group-hover:scale-110">
+            +
+          </span>
+        </Link>
+      </div>
     </main>
   );
 }

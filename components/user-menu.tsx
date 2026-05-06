@@ -56,6 +56,9 @@ export function UserMenu({
         <DropdownMenuItem onClick={() => router.push("/me")}>
           个人中心
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/swipe")}>
+          随便逛
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/suggest")}>
           提一题
         </DropdownMenuItem>
