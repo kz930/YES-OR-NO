@@ -9,6 +9,7 @@ import {
   useTransform,
   type PanInfo,
 } from "motion/react";
+import { toast } from "sonner";
 import { Heart } from "@/components/icons/heart";
 
 interface Card {
@@ -55,7 +56,17 @@ export function SwipeStack({ cards: initial }: { cards: Card[] }) {
   function pop(direction: "left" | "right", id: number) {
     if (direction === "right") {
       // Optimistic like (idempotent on the API side)
-      void fetch(`/api/questions/${id}/like`, { method: "POST" });
+      // Detached promise but still surfaces errors via toast.
+      fetch(`/api/questions/${id}/like`, { method: "POST" })
+        .then(async (res) => {
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            toast.error(body.error ?? `喜欢失败 (${res.status})`);
+          }
+        })
+        .catch((err) => {
+          toast.error(`网络错误:${err?.message ?? "未知"}`);
+        });
     }
     setCards((curr) => curr.filter((c) => c.id !== id));
   }
