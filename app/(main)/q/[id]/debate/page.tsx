@@ -39,10 +39,11 @@ export default async function DebatePage({
   }
 
   // Fetch the related profiles in a second round-trip and join in JS.
+  // public_profiles view exposes nickname/avatar but never email.
   const userIds = Array.from(new Set((argRows ?? []).map((a) => a.user_id)));
   const { data: profileRows } = userIds.length
     ? await supabase
-        .from("profiles")
+        .from("public_profiles")
         .select("id, nickname, avatar_url")
         .in("id", userIds)
     : { data: [] };

@@ -26,20 +26,33 @@ export default async function AdminSuggestionsPage({
     ? (rawStatus as Status)
     : "pending";
 
-  const { data: rows } = await ctx.supabase
+  // Same decoupled-fetch pattern as the debate page — avoids PostgREST
+  // resource-embed brittleness right after schema changes, and lets us
+  // route profile reads through the PII-safe public_profiles view.
+  const { data: rawRows } = await ctx.supabase
     .from("question_suggestions")
     .select(`
-      id, title, description, side_a_label, side_b_label, source,
+      id, user_id, title, description, side_a_label, side_b_label, source,
       status, reviewer_note, approved_question_id, is_anonymous, created_at,
-      categories(slug, name),
-      profiles:user_id(nickname, avatar_url)
+      categories(slug, name)
     `)
     .eq("status", status)
     .order("created_at", { ascending: status === "pending" });
 
-  const items = (rows ?? []).map((r) => {
+  const userIds = Array.from(new Set((rawRows ?? []).map((r) => r.user_id)));
+  const { data: profileRows } = userIds.length
+    ? await ctx.supabase
+        .from("public_profiles")
+        .select("id, nickname, avatar_url")
+        .in("id", userIds)
+    : { data: [] };
+  const profileMap = new Map(
+    (profileRows ?? []).map((p) => [p.id, p])
+  );
+
+  const items = (rawRows ?? []).map((r) => {
     const cat = Array.isArray(r.categories) ? r.categories[0] : r.categories;
-    const proposer = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+    const proposer = profileMap.get(r.user_id);
     return {
       id: r.id,
       title: r.title,
@@ -53,8 +66,8 @@ export default async function AdminSuggestionsPage({
       isAnonymous: r.is_anonymous ?? false,
       createdAt: r.created_at,
       categoryName: cat?.name ?? null,
-      proposerNickname: (proposer as { nickname?: string } | null)?.nickname ?? "?",
-      proposerAvatar: (proposer as { avatar_url?: string | null } | null)?.avatar_url ?? null,
+      proposerNickname: proposer?.nickname ?? "?",
+      proposerAvatar: proposer?.avatar_url ?? null,
     };
   });
 

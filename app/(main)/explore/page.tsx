@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Heart } from "@/components/icons/heart";
+import { ExploreSearch } from "@/components/explore-search";
 
 type Sort = "latest" | "popular" | "liked" | "discussed";
 
@@ -14,12 +15,13 @@ const SORT_OPTIONS: { value: Sort; label: string }[] = [
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; sort?: Sort }>;
+  searchParams: Promise<{ category?: string; sort?: Sort; q?: string }>;
 }) {
-  const { category: categorySlug, sort: rawSort } = await searchParams;
+  const { category: categorySlug, sort: rawSort, q: rawQ } = await searchParams;
   const sort: Sort = SORT_OPTIONS.some((s) => s.value === rawSort)
     ? (rawSort as Sort)
     : "latest";
+  const query = (rawQ ?? "").trim();
 
   const supabase = await createClient();
   const {
@@ -48,6 +50,11 @@ export default async function ExplorePage({
     .eq("status", "published");
 
   if (categoryId !== null) qb = qb.eq("category_id", categoryId);
+  if (query) {
+    // Escape % and _ so user input doesn't act as a wildcard
+    const safe = query.replace(/[%_\\]/g, (m) => "\\" + m);
+    qb = qb.ilike("title", `%${safe}%`);
+  }
 
   switch (sort) {
     case "popular":
@@ -74,7 +81,13 @@ export default async function ExplorePage({
     : { data: [] };
   const votedMap = new Map((myVotes ?? []).map((v) => [v.question_id, v.current_side]));
 
-  const baseQs = categorySlug ? `category=${categorySlug}&` : "";
+  const baseQs = [
+    categorySlug ? `category=${encodeURIComponent(categorySlug)}` : "",
+    query ? `q=${encodeURIComponent(query)}` : "",
+  ]
+    .filter(Boolean)
+    .join("&");
+  const baseSep = baseQs ? `${baseQs}&` : "";
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5 px-5 py-8">
@@ -88,13 +101,21 @@ export default async function ExplorePage({
           </h1>
         )}
 
+        <div className="mt-3">
+          <ExploreSearch
+            initialQuery={query}
+            categorySlug={categorySlug ?? null}
+            sort={sort}
+          />
+        </div>
+
         <div className="mt-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SORT_OPTIONS.map((opt) => {
             const active = opt.value === sort;
             return (
               <Link
                 key={opt.value}
-                href={`/explore?${baseQs}sort=${opt.value}`}
+                href={`/explore?${baseSep}sort=${opt.value}`}
                 className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
                   active
                     ? "bg-ink text-cream"

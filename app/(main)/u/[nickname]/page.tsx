@@ -17,11 +17,11 @@ export default async function PublicProfilePage({
 
   const supabase = await createClient();
 
-  // IMPORTANT: never select 'email' here. This is a public-facing page
-  // and exposing email would leak user PII to anyone who can guess
-  // the URL.
+  // public_profiles view exposes only id/nickname/avatar_url/is_admin/
+  // created_at — email is not part of the projection so it physically
+  // cannot leak from this page.
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("public_profiles")
     .select("id, nickname, avatar_url, is_admin, created_at")
     .eq("nickname", nickname)
     .maybeSingle();
