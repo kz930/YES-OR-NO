@@ -96,7 +96,10 @@ create table argument_likes (
   primary key (user_id, argument_id)
 );
 
--- Maintain arguments.likes_count via trigger
+-- Maintain arguments.likes_count via trigger.
+-- SECURITY DEFINER so the count UPDATE bypasses RLS — the arguments table
+-- only allows owners to UPDATE their own rows, but a like from another
+-- user still needs to bump the count.
 create or replace function bump_argument_likes() returns trigger as $$
 begin
   if TG_OP = 'INSERT' then
@@ -106,7 +109,7 @@ begin
   end if;
   return null;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger trg_argument_likes_bump
   after insert or delete on argument_likes

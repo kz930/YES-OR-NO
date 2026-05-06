@@ -22,7 +22,7 @@ begin
   end if;
   return null;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger trg_question_likes_bump
   after insert or delete on question_likes
@@ -50,7 +50,7 @@ begin
   end if;
   return null;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger trg_question_votes_bump
   after insert or delete on votes
@@ -73,7 +73,7 @@ begin
   end if;
   return null;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger trg_question_arguments_bump
   after insert or delete on arguments
