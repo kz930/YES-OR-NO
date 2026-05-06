@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { CommentThread } from "@/components/comment-thread";
 import { QuestionLikeButton } from "@/components/question-like-button";
 
+export const dynamic = "force-dynamic";
+
 export default async function DebatePage({
   params,
   searchParams,
@@ -23,40 +25,58 @@ export default async function DebatePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [
-    { data: question },
-    { data: vote },
-    { data: arguments_ },
-    { data: questionLike },
-  ] = await Promise.all([
-    supabase
-      .from("questions")
-      .select("id, title, side_a_label, side_b_label, likes_count, votes_count, arguments_count")
-      .eq("id", questionId)
-      .single(),
-    supabase
-      .from("votes")
-      .select("current_side")
-      .eq("user_id", user!.id)
-      .eq("question_id", questionId)
-      .maybeSingle(),
-    // NOTE: is_anonymous omitted from explicit select to dodge a stale
-    // PostgREST schema cache after migration 0009. We read the whole row
-    // with `*` so the column comes through if the cache is fresh, and
-    // fall back to false if the property is undefined.
-    supabase
-      .from("arguments")
-      .select(`*, profiles(nickname, avatar_url)`)
-      .eq("question_id", questionId)
-      .order(orderByLikes ? "likes_count" : "created_at", { ascending: false })
-      .limit(100),
-    supabase
-      .from("question_likes")
-      .select("user_id")
-      .eq("user_id", user!.id)
-      .eq("question_id", questionId)
-      .maybeSingle(),
-  ]);
+  // Fetch arguments first (without profile join — PostgREST embedded
+  // resource lookups can be flaky right after schema changes).
+  const { data: argRows, error: argError } = await supabase
+    .from("arguments")
+    .select("*")
+    .eq("question_id", questionId)
+    .order(orderByLikes ? "likes_count" : "created_at", { ascending: false })
+    .limit(100);
+
+  if (argError) {
+    console.error("[debate] arguments fetch failed:", argError);
+  }
+
+  // Fetch the related profiles in a second round-trip and join in JS.
+  const userIds = Array.from(new Set((argRows ?? []).map((a) => a.user_id)));
+  const { data: profileRows } = userIds.length
+    ? await supabase
+        .from("profiles")
+        .select("id, nickname, avatar_url")
+        .in("id", userIds)
+    : { data: [] };
+  const profileMap = new Map(
+    (profileRows ?? []).map((p) => [p.id, p])
+  );
+
+  const arguments_ = (argRows ?? []).map((a) => ({
+    ...a,
+    profile: profileMap.get(a.user_id) ?? null,
+  }));
+
+  const [{ data: question }, { data: vote }, { data: questionLike }] =
+    await Promise.all([
+      supabase
+        .from("questions")
+        .select(
+          "id, title, side_a_label, side_b_label, likes_count, votes_count, arguments_count"
+        )
+        .eq("id", questionId)
+        .single(),
+      supabase
+        .from("votes")
+        .select("current_side")
+        .eq("user_id", user!.id)
+        .eq("question_id", questionId)
+        .maybeSingle(),
+      supabase
+        .from("question_likes")
+        .select("user_id")
+        .eq("user_id", user!.id)
+        .eq("question_id", questionId)
+        .maybeSingle(),
+    ]);
 
   if (!question) notFound();
 
@@ -142,18 +162,15 @@ export default async function DebatePage({
           myLabel={myLabel ?? ""}
           sideALabel={question.side_a_label}
           sideBLabel={question.side_b_label}
-          initialArguments={(arguments_ ?? []).map((a) => ({
+          initialArguments={arguments_.map((a) => ({
             id: a.id,
             content: a.content,
             side: a.side,
             likes_count: a.likes_count,
             is_anonymous: a.is_anonymous ?? false,
             created_at: a.created_at,
-            // Supabase types FK joins as either array or object
-            nickname:
-              (Array.isArray(a.profiles) ? a.profiles[0]?.nickname : (a.profiles as { nickname?: string } | null)?.nickname) ?? "用户",
-            avatar_url:
-              (Array.isArray(a.profiles) ? a.profiles[0]?.avatar_url : (a.profiles as { avatar_url?: string | null } | null)?.avatar_url) ?? null,
+            nickname: a.profile?.nickname ?? "用户",
+            avatar_url: a.profile?.avatar_url ?? null,
             initiallyLiked: likedArgs.has(a.id),
           }))}
           sortMode={orderByLikes ? "likes" : "time"}
