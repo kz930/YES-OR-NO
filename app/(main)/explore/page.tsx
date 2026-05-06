@@ -1,15 +1,30 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { Heart } from "@/components/icons/heart";
+
+type Sort = "latest" | "popular" | "liked" | "discussed";
+
+const SORT_OPTIONS: { value: Sort; label: string }[] = [
+  { value: "latest",   label: "最新" },
+  { value: "popular",  label: "最多投票" },
+  { value: "liked",    label: "最多喜欢" },
+  { value: "discussed", label: "最多讨论" },
+];
 
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; sort?: Sort }>;
 }) {
-  const { category: categorySlug } = await searchParams;
-  const supabase = await createClient();
+  const { category: categorySlug, sort: rawSort } = await searchParams;
+  const sort: Sort = SORT_OPTIONS.some((s) => s.value === rawSort)
+    ? (rawSort as Sort)
+    : "latest";
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   let categoryId: number | null = null;
   let categoryName: string | null = null;
@@ -27,16 +42,28 @@ export default async function ExplorePage({
 
   let qb = supabase
     .from("questions")
-    .select("id, title, source, source_detail, category_id, is_daily")
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+    .select(
+      "id, title, source, source_detail, category_id, likes_count, votes_count, arguments_count"
+    )
+    .eq("status", "published");
 
-  if (categoryId !== null) {
-    qb = qb.eq("category_id", categoryId);
+  if (categoryId !== null) qb = qb.eq("category_id", categoryId);
+
+  switch (sort) {
+    case "popular":
+      qb = qb.order("votes_count", { ascending: false });
+      break;
+    case "liked":
+      qb = qb.order("likes_count", { ascending: false });
+      break;
+    case "discussed":
+      qb = qb.order("arguments_count", { ascending: false });
+      break;
+    default:
+      qb = qb.order("created_at", { ascending: false });
   }
 
   const { data: questions } = await qb;
-
   const ids = (questions ?? []).map((q) => q.id);
   const { data: myVotes } = ids.length
     ? await supabase
@@ -45,22 +72,40 @@ export default async function ExplorePage({
         .eq("user_id", user!.id)
         .in("question_id", ids)
     : { data: [] };
+  const votedMap = new Map((myVotes ?? []).map((v) => [v.question_id, v.current_side]));
 
-  const votedMap = new Map(
-    (myVotes ?? []).map((v) => [v.question_id, v.current_side])
-  );
+  const baseQs = categorySlug ? `category=${categorySlug}&` : "";
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-5 py-8">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5 px-5 py-8">
       <div>
         <p className="text-xs uppercase tracking-[0.2em] text-ink-soft">
-          {categoryName ? "分类" : "全部题目"}
+          {categoryName ? "分类 · Category" : "全部题目 · Browse"}
         </p>
         {categoryName && (
           <h1 className="mt-1 text-2xl font-semibold -tracking-[0.01em] text-ink">
             {categoryName}
           </h1>
         )}
+
+        <div className="mt-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {SORT_OPTIONS.map((opt) => {
+            const active = opt.value === sort;
+            return (
+              <Link
+                key={opt.value}
+                href={`/explore?${baseQs}sort=${opt.value}`}
+                className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
+                  active
+                    ? "bg-ink text-cream"
+                    : "bg-cream-2 text-ink-soft hover:text-ink"
+                }`}
+              >
+                {opt.label}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {questions && questions.length > 0 ? (
@@ -90,12 +135,21 @@ export default async function ExplorePage({
                       </span>
                     )}
                   </div>
-                  {q.source && (
-                    <p className="mt-2 text-[11px] uppercase tracking-wider text-ink-soft">
-                      · {q.source}
-                      {q.source_detail ? ` · ${q.source_detail}` : ""}
-                    </p>
-                  )}
+
+                  <div className="mt-3 flex items-center gap-4 text-[11px] font-medium text-ink-soft">
+                    <Stat icon="🗳" value={q.votes_count ?? 0} label="投" />
+                    <Stat
+                      icon={<Heart className="h-3 w-3" />}
+                      value={q.likes_count ?? 0}
+                      label="喜欢"
+                    />
+                    <Stat icon="💬" value={q.arguments_count ?? 0} label="讨论" />
+                    {q.source && (
+                      <span className="ml-auto truncate uppercase tracking-wider">
+                        {q.source}
+                      </span>
+                    )}
+                  </div>
                 </Link>
               </li>
             );
@@ -103,9 +157,27 @@ export default async function ExplorePage({
         </ul>
       ) : (
         <div className="rounded-2xl bg-card p-10 text-center text-sm text-ink-soft ring-1 ring-border/50">
-          这个分类还没有题目。
+          这里还没有题目。
         </div>
       )}
     </main>
+  );
+}
+
+function Stat({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+}) {
+  return (
+    <span className="flex items-center gap-1">
+      <span className="text-sm">{icon}</span>
+      <span className="font-bold text-ink">{value}</span>
+      <span className="hidden sm:inline">{label}</span>
+    </span>
   );
 }

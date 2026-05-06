@@ -1,33 +1,69 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { GachaponCard } from "@/components/gachapon-card";
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { data: dailyQuestions } = await supabase
+  // Strategy: prefer a random question the user hasn't voted on yet.
+  // Falls back to any published question if all have been voted.
+  const { data: votedRows } = await supabase
+    .from("votes")
+    .select("question_id")
+    .eq("user_id", user!.id);
+
+  const votedIds = (votedRows ?? []).map((v) => v.question_id);
+
+  let qb = supabase
     .from("questions")
-    .select("id, title, source, source_detail, side_a_label, side_b_label, category_id")
-    .eq("status", "published")
-    .eq("is_daily", true)
-    .limit(1);
+    .select(
+      "id, title, source, source_detail, side_a_label, side_b_label, likes_count"
+    )
+    .eq("status", "published");
 
-  let question = dailyQuestions?.[0];
+  if (votedIds.length > 0) {
+    qb = qb.not("id", "in", `(${votedIds.join(",")})`);
+  }
+
+  const { data: candidates } = await qb;
+
+  let question = candidates && candidates.length > 0
+    ? candidates[Math.floor(Math.random() * candidates.length)]
+    : undefined;
+
+  // All voted? Just show a recent one.
   if (!question) {
     const { data: fallback } = await supabase
       .from("questions")
-      .select("id, title, source, source_detail, side_a_label, side_b_label, category_id")
+      .select("id, title, source, source_detail, side_a_label, side_b_label, likes_count")
       .eq("status", "published")
       .order("created_at", { ascending: false })
       .limit(1);
     question = fallback?.[0];
   }
 
+  let liked = false;
+  if (question) {
+    const { data: likeRow } = await supabase
+      .from("question_likes")
+      .select("user_id")
+      .eq("user_id", user!.id)
+      .eq("question_id", question.id)
+      .maybeSingle();
+    liked = !!likeRow;
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-5 py-10">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-5 pb-12 pt-10">
       <section>
         <div className="flex items-baseline justify-between">
           <p className="text-xs uppercase tracking-[0.2em] text-ink-soft">
-            今天聊聊 · Today
+            今天聊聊 · A question for you
           </p>
           <Link
             href="/explore"
@@ -37,44 +73,15 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        {question ? (
-          <article className="mt-3 rounded-[28px] bg-card p-8 shadow-[0_2px_24px_-8px_rgba(31,42,36,0.08)] ring-1 ring-border/50 sm:p-10">
-            <h2 className="text-[28px] font-semibold leading-[1.25] -tracking-[0.01em] text-ink sm:text-[32px]">
-              {question.title}
-            </h2>
-            {question.source && (
-              <p className="mt-4 text-xs uppercase tracking-wider text-ink-soft">
-                · {question.source}
-                {question.source_detail ? ` · ${question.source_detail}` : ""}
-              </p>
-            )}
-
-            <div className="mt-10 grid grid-cols-2 gap-3">
-              <Link
-                href={`/q/${question.id}?side=a`}
-                className="flex h-16 flex-col items-center justify-center rounded-2xl bg-forest text-white transition-all hover:bg-forest-2 active:scale-[0.97]"
-              >
-                <span className="text-base font-bold tracking-tight">YES</span>
-                <span className="text-[11px] font-medium opacity-90">
-                  {question.side_a_label}
-                </span>
-              </Link>
-              <Link
-                href={`/q/${question.id}?side=b`}
-                className="flex h-16 flex-col items-center justify-center rounded-2xl bg-blossom text-mulberry transition-all hover:bg-blossom-2 hover:text-white active:scale-[0.97]"
-              >
-                <span className="text-base font-bold tracking-tight">NO</span>
-                <span className="text-[11px] font-medium opacity-90">
-                  {question.side_b_label}
-                </span>
-              </Link>
-            </div>
-          </article>
-        ) : (
-          <article className="mt-3 rounded-[28px] bg-card p-10 text-center text-ink-soft ring-1 ring-border/50">
-            题库还是空的,先在 Supabase SQL editor 跑 0003_seed_sample_questions.sql。
-          </article>
-        )}
+        <div className="mt-5">
+          {question ? (
+            <GachaponCard question={question} liked={liked} />
+          ) : (
+            <article className="rounded-[28px] bg-card p-10 text-center text-ink-soft ring-1 ring-border/50">
+              题库还是空的,先在 Supabase SQL editor 跑 0003_seed_sample_questions.sql。
+            </article>
+          )}
+        </div>
       </section>
 
       <Link
