@@ -64,10 +64,19 @@ export function UserMenu({
         <DropdownMenuItem onClick={() => router.push("/me/suggestions")}>
           我提议的题
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/feedback")}>
+          意见反馈
+        </DropdownMenuItem>
         {isAdmin && (
-          <DropdownMenuItem onClick={() => router.push("/admin/suggestions")}>
-            审核队列
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/admin/suggestions")}>
+              审核队列
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/admin/feedback")}>
+              用户反馈
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="text-red-600">
