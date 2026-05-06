@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -46,12 +45,12 @@ export function UserMenu({
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel className="font-normal">
-          <span className="block text-sm font-semibold">{nickname}</span>
+        <div className="px-2 py-1.5">
+          <p className="text-sm font-semibold text-ink">{nickname}</p>
           {isAdmin && (
-            <span className="text-xs font-semibold text-forest">管理员</span>
+            <p className="text-xs font-semibold text-forest">管理员</p>
           )}
-        </DropdownMenuLabel>
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/me")}>
           个人中心
