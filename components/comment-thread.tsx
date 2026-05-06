@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -200,34 +201,55 @@ function CommentItem({ comment }: { comment: CommentRow }) {
 
   const displayName = comment.is_anonymous ? "匿名" : comment.nickname;
   const showAvatar = !comment.is_anonymous && comment.avatar_url;
+  const profileHref = comment.is_anonymous
+    ? null
+    : `/u/${encodeURIComponent(comment.nickname)}`;
+
+  const Avi = (
+    <Avatar className="h-9 w-9 shrink-0">
+      {showAvatar && (
+        <AvatarImage src={comment.avatar_url!} alt={displayName} />
+      )}
+      <AvatarFallback
+        className={`text-sm font-bold ${
+          comment.is_anonymous
+            ? "bg-cream-2 text-ink-soft"
+            : "bg-jade text-white"
+        }`}
+      >
+        {comment.is_anonymous ? "匿" : displayName.charAt(0).toUpperCase()}
+      </AvatarFallback>
+    </Avatar>
+  );
+
+  const Name = (
+    <span
+      className={`text-sm font-semibold ${
+        comment.is_anonymous
+          ? "text-ink-soft italic"
+          : "text-ink hover:underline"
+      }`}
+    >
+      {displayName}
+    </span>
+  );
 
   return (
     <li className="rounded-2xl bg-card p-4 ring-1 ring-border/50">
       <div className="flex items-start gap-3">
-        <Avatar className="h-9 w-9 shrink-0">
-          {showAvatar && (
-            <AvatarImage src={comment.avatar_url!} alt={displayName} />
-          )}
-          <AvatarFallback
-            className={`text-sm font-bold ${
-              comment.is_anonymous
-                ? "bg-cream-2 text-ink-soft"
-                : "bg-jade text-white"
-            }`}
-          >
-            {comment.is_anonymous ? "匿" : displayName.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        {profileHref ? (
+          <Link href={profileHref} className="shrink-0">{Avi}</Link>
+        ) : (
+          Avi
+        )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span
-              className={`text-sm font-semibold ${
-                comment.is_anonymous ? "text-ink-soft italic" : "text-ink"
-              }`}
-            >
-              {displayName}
-            </span>
+            {profileHref ? (
+              <Link href={profileHref}>{Name}</Link>
+            ) : (
+              Name
+            )}
             <span
               className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-bold tracking-wider ${
                 comment.side === "a"
