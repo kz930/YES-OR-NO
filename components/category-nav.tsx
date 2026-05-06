@@ -23,17 +23,15 @@ function CategoryNavInner({ categories }: { categories: Category[] }) {
   const searchParams = useSearchParams();
   const currentSlug = searchParams.get("category");
 
+  const isHomeActive = pathname === "/";
   const isAllActive = pathname === "/explore" && !currentSlug;
 
   return (
     <nav className="border-t border-border/40">
       <div className="mx-auto max-w-3xl">
         <div className="flex gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <CategoryPill
-            href="/explore"
-            label="全部"
-            active={isAllActive}
-          />
+          <CategoryPill href="/" label="主页" active={isHomeActive} />
+          <CategoryPill href="/explore" label="全部" active={isAllActive} />
           {categories.map((cat) => (
             <CategoryPill
               key={cat.id}
