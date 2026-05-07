@@ -23,7 +23,7 @@ export default async function HomePage() {
   let qb = supabase
     .from("questions")
     .select(
-      "id, title, source, source_detail, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count"
+      "id, title, description, source, source_detail, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count"
     )
     .eq("status", "published");
 

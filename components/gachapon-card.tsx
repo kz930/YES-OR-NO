@@ -11,6 +11,7 @@ interface Props {
   question: {
     id: number;
     title: string;
+    description: string | null;
     source: string | null;
     source_detail: string | null;
     side_a_label: string;
@@ -35,6 +36,7 @@ export function GachaponCard({ question, liked: initialLiked }: Props) {
   const [submitting, setSubmitting] = useState<Side | null>(null);
   const [yesCount, setYesCount] = useState(question.yes_votes_count);
   const [noCount, setNoCount] = useState(question.no_votes_count);
+  const [showBg, setShowBg] = useState(false);
 
   async function vote(side: Side) {
     if (voted || submitting) return;
@@ -90,6 +92,26 @@ export function GachaponCard({ question, liked: initialLiked }: Props) {
       <h2 className="text-[28px] font-semibold leading-[1.25] -tracking-[0.01em] text-ink sm:text-[32px]">
         {question.title}
       </h2>
+
+      {question.description && (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setShowBg((v) => !v)}
+            className="inline-flex items-center gap-1 rounded-full bg-cream-2 px-2.5 py-1 text-[11px] font-semibold text-ink-soft hover:bg-jade/30"
+            aria-expanded={showBg}
+          >
+            <span>ⓘ</span>
+            <span>{showBg ? "收起背景" : "了解背景"}</span>
+          </button>
+          {showBg && (
+            <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">
+              {question.description}
+            </p>
+          )}
+        </div>
+      )}
+
       {question.source && (
         <p className="mt-4 text-xs uppercase tracking-wider text-ink-soft">
           · {question.source}
@@ -113,7 +135,7 @@ export function GachaponCard({ question, liked: initialLiked }: Props) {
             </div>
             <div className="mt-1.5 flex justify-between text-[11px] font-semibold">
               <span className="text-forest">YES {yesPct}% · {yesCount} 票</span>
-              <span className="text-mulberry">{noCount} 票 · {noPct}% NO</span>
+              <span className="text-mulberry">NO {noPct}% · {noCount} 票</span>
             </div>
           </div>
 

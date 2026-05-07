@@ -83,7 +83,7 @@ export default async function DebatePage({
       supabase
         .from("questions")
         .select(
-          "id, title, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count, arguments_count"
+          "id, title, description, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count, arguments_count"
         )
         .eq("id", questionId)
         .single(),
@@ -131,6 +131,11 @@ export default async function DebatePage({
         <h1 className="text-xl font-semibold leading-snug -tracking-[0.01em] text-ink sm:text-2xl">
           {question.title}
         </h1>
+        {question.description && (
+          <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+            {question.description}
+          </p>
+        )}
 
         {/* Vote split bar */}
         {total > 0 ? (
@@ -147,7 +152,7 @@ export default async function DebatePage({
             </div>
             <div className="mt-1.5 flex justify-between text-[11px] font-semibold text-ink-soft">
               <span className="text-forest">YES {yesPct}% · {yesCount} 票</span>
-              <span className="text-mulberry">{noCount} 票 · {noPct}% NO</span>
+              <span className="text-mulberry">NO {noPct}% · {noCount} 票</span>
             </div>
           </div>
         ) : (
