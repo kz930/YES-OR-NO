@@ -80,7 +80,7 @@ export default async function SwipePage() {
           一张张翻过去
         </h1>
         <p className="mt-1.5 text-xs text-ink-soft">
-          右滑喜欢 · 左滑跳过 · 点开投票
+          左滑 YES · 右滑 NO · 点卡片看详情
         </p>
       </div>
 

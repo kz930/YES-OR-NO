@@ -11,6 +11,7 @@ import {
 } from "motion/react";
 import { toast } from "sonner";
 import { Heart } from "@/components/icons/heart";
+import type { Side } from "@/types/db";
 
 interface Card {
   id: number;
@@ -28,6 +29,8 @@ interface Card {
 }
 
 const SWIPE_THRESHOLD = 110;
+
+type Action = "yes" | "no" | "skip";
 
 export function SwipeStack({ cards: initial }: { cards: Card[] }) {
   const router = useRouter();
@@ -53,15 +56,19 @@ export function SwipeStack({ cards: initial }: { cards: Card[] }) {
     );
   }
 
-  function pop(direction: "left" | "right", id: number) {
-    if (direction === "right") {
-      // Optimistic like (idempotent on the API side)
-      // Detached promise but still surfaces errors via toast.
-      fetch(`/api/questions/${id}/like`, { method: "POST" })
+  function pop(action: Action, id: number) {
+    if (action === "yes" || action === "no") {
+      // Optimistic vote — fire and forget; surface failures via toast.
+      const side: Side = action === "yes" ? "a" : "b";
+      fetch(`/api/questions/${id}/vote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ side }),
+      })
         .then(async (res) => {
           if (!res.ok) {
             const body = await res.json().catch(() => ({}));
-            toast.error(body.error ?? `喜欢失败 (${res.status})`);
+            toast.error(body.error ?? `投票失败 (${res.status})`);
           }
         })
         .catch((err) => {
@@ -95,28 +102,28 @@ export function SwipeStack({ cards: initial }: { cards: Card[] }) {
         </AnimatePresence>
       </div>
 
-      {/* Tap shortcuts under the deck */}
-      <div className="flex items-center justify-center gap-6">
+      {/* Tap shortcuts under the deck: YES · SKIP · NO */}
+      <div className="flex items-center justify-center gap-5">
+        <button
+          aria-label="YES"
+          onClick={() => visible[0] && pop("yes", visible[0].id)}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-forest text-white text-xs font-bold tracking-tight shadow-sm transition-transform hover:scale-110 active:scale-95"
+        >
+          YES
+        </button>
         <button
           aria-label="跳过"
-          onClick={() => visible[0] && pop("left", visible[0].id)}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-card text-2xl ring-1 ring-border/60 transition-transform hover:scale-110 active:scale-95"
+          onClick={() => visible[0] && pop("skip", visible[0].id)}
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-cream-2 text-lg text-ink-soft transition-transform hover:scale-110 active:scale-95"
         >
           ✕
         </button>
         <button
-          aria-label="点击进入"
-          onClick={() => visible[0] && tap(visible[0].id)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-cream-2 text-base font-semibold text-ink transition-transform hover:scale-110 active:scale-95"
+          aria-label="NO"
+          onClick={() => visible[0] && pop("no", visible[0].id)}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-blossom text-mulberry text-xs font-bold tracking-tight shadow-sm transition-transform hover:scale-110 active:scale-95"
         >
-          投
-        </button>
-        <button
-          aria-label="喜欢"
-          onClick={() => visible[0] && pop("right", visible[0].id)}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-blossom text-mulberry transition-transform hover:scale-110 active:scale-95"
-        >
-          <Heart className="h-6 w-6 fill-current" />
+          NO
         </button>
       </div>
     </>
@@ -133,32 +140,32 @@ function SwipeCard({
   card: Card;
   depth: number;
   isTop: boolean;
-  onSwipe: (dir: "left" | "right", id: number) => void;
+  onSwipe: (action: Action, id: number) => void;
   onTap: (id: number) => void;
 }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-220, 0, 220], [-14, 0, 14]);
-  const likeOpacity = useTransform(x, [40, 140], [0, 1]);
-  const skipOpacity = useTransform(x, [-140, -40], [1, 0]);
+  // Left swipe = YES, right swipe = NO
+  const yesOpacity = useTransform(x, [-140, -40], [1, 0]);
+  const noOpacity = useTransform(x, [40, 140], [0, 1]);
 
-  // Cards behind the top one are slightly smaller and offset
   const baseScale = depth === 0 ? 1 : depth === 1 ? 0.96 : 0.92;
   const baseY = depth * 10;
 
   function onDragEnd(_e: unknown, info: PanInfo) {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
-    if (offset > SWIPE_THRESHOLD || velocity > 600) {
-      onSwipe("right", card.id);
-    } else if (offset < -SWIPE_THRESHOLD || velocity < -600) {
-      onSwipe("left", card.id);
+    if (offset < -SWIPE_THRESHOLD || velocity < -600) {
+      // Left swipe → YES vote
+      onSwipe("yes", card.id);
+    } else if (offset > SWIPE_THRESHOLD || velocity > 600) {
+      // Right swipe → NO vote
+      onSwipe("no", card.id);
     } else {
-      // Snap back
       x.set(0);
     }
   }
 
-  // Only the top card is draggable. Others render as static stack.
   const tappable = useMemo(() => {
     let dragged = false;
     return {
@@ -212,19 +219,19 @@ function SwipeCard({
       {isTop && (
         <>
           <motion.div
-            style={{ opacity: likeOpacity }}
-            className="pointer-events-none absolute left-6 top-6 rotate-[-12deg] rounded-2xl border-4 border-blossom-2 px-4 py-1.5"
+            style={{ opacity: yesOpacity }}
+            className="pointer-events-none absolute left-6 top-6 rotate-[-12deg] rounded-2xl border-4 border-forest px-4 py-1.5"
           >
-            <span className="text-2xl font-extrabold tracking-widest text-blossom-2">
-              喜欢
+            <span className="text-2xl font-extrabold tracking-widest text-forest">
+              YES
             </span>
           </motion.div>
           <motion.div
-            style={{ opacity: skipOpacity }}
-            className="pointer-events-none absolute right-6 top-6 rotate-[12deg] rounded-2xl border-4 border-ink/70 px-4 py-1.5"
+            style={{ opacity: noOpacity }}
+            className="pointer-events-none absolute right-6 top-6 rotate-[12deg] rounded-2xl border-4 border-blossom-2 px-4 py-1.5"
           >
-            <span className="text-2xl font-extrabold tracking-widest text-ink/80">
-              跳过
+            <span className="text-2xl font-extrabold tracking-widest text-blossom-2">
+              NO
             </span>
           </motion.div>
         </>
@@ -282,7 +289,7 @@ function SwipeCard({
           </span>
           {isTop && (
             <span className="ml-auto text-[10px] uppercase tracking-wider">
-              点开投票
+              点开看详情
             </span>
           )}
         </div>

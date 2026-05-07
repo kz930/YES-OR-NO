@@ -56,6 +56,28 @@ export default async function DebatePage({
     profile: profileMap.get(a.user_id) ?? null,
   }));
 
+  // Pick a random unvoted question id for the "下一题" button.
+  // Excludes the question they're currently looking at as well.
+  const { data: votedRows } = await supabase
+    .from("votes")
+    .select("question_id")
+    .eq("user_id", user!.id);
+  const excludedIds = Array.from(
+    new Set([...(votedRows ?? []).map((v) => v.question_id), questionId])
+  );
+  let nextQb = supabase
+    .from("questions")
+    .select("id")
+    .eq("status", "published");
+  if (excludedIds.length > 0) {
+    nextQb = nextQb.not("id", "in", `(${excludedIds.join(",")})`);
+  }
+  const { data: candidates } = await nextQb.limit(50);
+  const nextId =
+    candidates && candidates.length > 0
+      ? candidates[Math.floor(Math.random() * candidates.length)].id
+      : null;
+
   const [{ data: question }, { data: vote }, { data: questionLike }] =
     await Promise.all([
       supabase
@@ -131,7 +153,7 @@ export default async function DebatePage({
           <p className="mt-4 text-sm text-ink-soft">还没有人投票呢。</p>
         )}
 
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between gap-3">
           {mySide && myLabel ? (
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
@@ -151,6 +173,19 @@ export default async function DebatePage({
           />
         </div>
       </article>
+
+      {nextId ? (
+        <Link
+          href={`/q/${nextId}`}
+          className="flex h-12 items-center justify-center rounded-2xl bg-forest text-sm font-semibold text-white transition-colors hover:bg-forest-2"
+        >
+          下一题 →
+        </Link>
+      ) : (
+        <p className="rounded-2xl bg-cream-2 p-4 text-center text-xs text-ink-soft">
+          🎉 你投过所有题啦,等等大家提的新题
+        </p>
+      )}
 
       {mySide ? (
         <CommentThread
