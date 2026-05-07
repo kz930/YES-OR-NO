@@ -59,3 +59,10 @@ update questions
 set title = '想象所有人同时秘密选择红色或蓝色胶囊,然后揭晓。如果全员都选红色,所有人死;如果红色派占多数但不是全部,红色活下来、蓝色派死;但只要蓝色派达到一半,全员都活下来。',
     description = E'① 100% 都选红色 → 全员死亡\n② 红色超过一半(但不是全部) → 红色活、蓝色死\n③ 蓝色达到一半或更多 → 全员都活'
 where title like '红蓝胶囊问题%';
+
+-- Newcomb's paradox (Nozick): box setup + predictor rule, no choice-side
+-- 'this looks more profitable' commentary so users wrestle with the
+-- dilemma themselves.
+update questions
+set description = E'桌上两个盒子:\n- A 透明,里面 $1,000\n- B 黑色,要么 $1,000,000、要么空\n\n预言家(几乎从不出错)在你选之前就决定了 B 的内容:\n- 预测你"只拿 B" → 里面放 $1,000,000\n- 预测你"两个都拿" → B 是空的\n\n你只能选一次,无法回头。'
+where title like '纽康姆悖论%';
