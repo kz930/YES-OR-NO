@@ -46,7 +46,7 @@ export default async function QuestionPage({
           {question.title}
         </h1>
         {question.description && (
-          <p className="mt-5 text-base leading-relaxed text-ink-soft">
+          <p className="mt-5 whitespace-pre-line text-base leading-relaxed text-ink-soft">
             {question.description}
           </p>
         )}

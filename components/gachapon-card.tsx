@@ -105,7 +105,7 @@ export function GachaponCard({ question, liked: initialLiked }: Props) {
             <span>{showBg ? "收起背景" : "了解背景"}</span>
           </button>
           {showBg && (
-            <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">
+            <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed text-ink-soft">
               {question.description}
             </p>
           )}

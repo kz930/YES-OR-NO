@@ -11,7 +11,7 @@ export default function AuthLayout({
             YES OR NO
           </h1>
           <p className="mt-3 text-sm text-ink-soft">
-            5 分钟 · 一道脑洞题 · 先选边再开战
+            一道脑洞题,你站哪边?
           </p>
         </div>
         <div className="rounded-3xl bg-card p-8 shadow-sm ring-1 ring-border/60">

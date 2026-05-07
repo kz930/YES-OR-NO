@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "YES OR NO — 5 分钟,一道脑洞题,先选边再开战",
+  title: "YES OR NO — 一道脑洞题,你站哪边?",
   description: "脑洞辩论投票 · 看观点 · 参与讨论的轻社区",
 };
 

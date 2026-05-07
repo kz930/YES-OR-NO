@@ -132,7 +132,7 @@ export default async function DebatePage({
           {question.title}
         </h1>
         {question.description && (
-          <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink-soft">
             {question.description}
           </p>
         )}
