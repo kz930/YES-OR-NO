@@ -65,7 +65,7 @@ export default async function HomePage() {
 
         <div className="mt-5">
           {question ? (
-            <GachaponCard question={question} liked={liked} />
+            <GachaponCard key={question.id} question={question} liked={liked} />
           ) : (
             <article className="rounded-[28px] bg-card p-10 text-center ring-1 ring-border/50">
               <p className="text-2xl">🎉</p>
