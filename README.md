@@ -1,72 +1,81 @@
 # YES OR NO
 
-> 一道脑洞题,你站哪边?
+> A thought experiment a day. Which side are you on?
 
-一个让你为脑洞辩论投票、看观点、参与讨论的轻社区。只做思想实验和有趣的假设题,拒绝政治和现实争议。
+A lightweight community for voting on hypothetical dilemmas, reading opposing arguments, and debating with strangers. Strictly thought experiments and "would you rather" questions (trolley problem, brain in a vat, Little Mermaid choosing foam vs eternal soul, etc.) — no real-world politics or current events.
 
-完整产品需求见 [docs/PRD_假设_v0.2.md](docs/PRD_假设_v0.2.md)。
+Full product spec: [docs/PRD_假设_v0.2.md](docs/PRD_假设_v0.2.md).
 
-## 技术栈
+## Stack
 
-- **Next.js 16** (App Router) + **TypeScript**
-- **Tailwind CSS 4** + **shadcn/ui**
-- **Supabase** (Postgres + Auth + RLS)
-- **TanStack Query** + **Zustand**
+- **Next.js 16** (App Router) + **TypeScript** + **React 19**
+- **Tailwind CSS 4** + **shadcn/ui** + **Motion (framer-motion)**
+- **Supabase** (Postgres + Auth + RLS + Storage)
+- **TanStack Query** + **Zustand** + **Sonner**
 
-## 本地开发
+## Features
+
+- **Home gachapon card** — Pulls one random question you haven't voted on yet. Vote, see the split, jump into the debate or skip to the next.
+- **Swipe deck** — Tinder-style cards: swipe left = YES, swipe right = NO, tap × to skip.
+- **Explore** — Browse the full question bank by category, with search and sort.
+- **Debate page** — After voting, a two-column argument view (your side vs the opposite). Each argument can be upvoted and replied to as a nested thread.
+- **Suggest a question** — Users submit their own hypotheticals (3/day cap). Admins review before publishing.
+- **Profile (`/me`)** — Your votes, likes, suggestions, and account settings.
+- **Public profile (`/u/[nickname]`)** — See what someone else voted and the arguments they've posted.
+- **Feedback** — In-app bug reports and ideas, with an admin resolution flow.
+- **Admin panel** — Suggestion review queue, feedback inbox, plus SQL-driven question edits.
+
+## Local development
 
 ```bash
-# 1. 装依赖(已经装过的话跳过)
+# 1. Install deps
 npm install
 
-# 2. 配置环境变量
+# 2. Configure env
 cp .env.example .env.local
-# 填入你的 Supabase URL 和 anon key
+# Fill in your Supabase URL / anon key / service role key
 
-# 3. 跑数据库 migration
-# 在 Supabase 控制台 → SQL editor 里执行 supabase/migrations/0001_init.sql
+# 3. Run migrations
+# In Supabase console → SQL editor, run supabase/migrations/*.sql in order
 
-# 4. 启动开发服务器
+# 4. Start the dev server
 npm run dev
 ```
 
-打开 http://localhost:3000 。
+Open http://localhost:3000.
 
-## 项目结构
+## Project layout
 
 ```
-/app                    Next.js App Router 路由
-  /(auth)               登录/注册 (待建)
-  /(main)               主应用 (待建)
-  /api                  Route Handlers (待建)
-/components             React 组件
-  /ui                   shadcn/ui 基础组件
-  providers.tsx         React Query + Toaster
-/lib                    工具与客户端
-  /supabase             浏览器 / 服务端 / 中间件 三个 client
-  utils.ts              shadcn 自带的 cn()
-/types
-  db.ts                 数据库类型(MVP 前期手写,后期改用 supabase gen types)
-/supabase/migrations    数据库迁移 SQL
-/docs                   PRD + 题库
-middleware.ts           Supabase session 刷新 + 路由守卫
+/app
+  /(auth)               Login / register
+  /(main)               Main app
+    page.tsx              Home gachapon card
+    swipe/                Swipe deck
+    explore/              Browse all
+    q/[id]/               Question detail + /debate page
+    suggest/              Submit a question
+    me/                   Personal profile
+    u/[nickname]/         Public profile
+    feedback/             User feedback
+    admin/                Admin panel
+  /api                    Route Handlers (vote / like / argument / suggestion / feedback / admin)
+/components
+  gachapon-card.tsx       Home vote card + post-vote state
+  swipe-stack.tsx         Swipe deck (Motion drag)
+  vote-buttons.tsx        Question-detail voting
+  comment-thread.tsx      Nested argument threads
+  /ui                     shadcn/ui primitives
+/lib/supabase             Browser / server / middleware clients
+/types/db.ts              DB types (hand-written for now; will switch to supabase gen types later)
+/supabase/migrations      Database migration SQL
+middleware.ts             Supabase session refresh + route guards
 ```
 
-## Roadmap
+## Deployment
 
-| Sprint | 内容 |
-|---|---|
-| **0** ✅ | 工程脚手架 |
-| **1** | 登录注册 + 首页 + 题目详情 + 投票闭环 |
-| **2** | 辩论页(双列+论点+点赞)+ 个人中心 |
-| **3** | 题目提议 + 我的提议 + 管理员审核 |
-| **4** | 视觉打磨、动画、移动端适配 |
-| **5** | 题库 seed + 每日一题 + 部署上线 |
+Currently deployed on Vercel. Mainland China users need a VPN to reach it — the ICP filing route isn't worth it at this scale yet.
 
-## 给自己设管理员
+## Granting admin
 
-跑完 migration、注册账号后,在 Supabase SQL editor 执行:
-
-```sql
-update profiles set is_admin = true where email = 'kary09302005@gmail.com';
-```
+After the owner signs up, an admin flag is flipped manually in the database. (Not documenting the exact query here on purpose.)
