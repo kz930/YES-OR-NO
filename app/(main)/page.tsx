@@ -22,7 +22,7 @@ export default async function HomePage() {
   let qb = supabase
     .from("questions")
     .select(
-      "id, title, source, source_detail, side_a_label, side_b_label, likes_count"
+      "id, title, source, source_detail, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count"
     )
     .eq("status", "published");
 
@@ -40,7 +40,9 @@ export default async function HomePage() {
   if (!question) {
     const { data: fallback } = await supabase
       .from("questions")
-      .select("id, title, source, source_detail, side_a_label, side_b_label, likes_count")
+      .select(
+        "id, title, source, source_detail, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count"
+      )
       .eq("status", "published")
       .order("created_at", { ascending: false })
       .limit(1);
