@@ -110,6 +110,7 @@ export default async function DebatePage({
   // so per-row count(*) would always return just the viewer's vote).
   const total = question.votes_count ?? 0;
   const yesCount = question.yes_votes_count ?? 0;
+  const noCount = question.no_votes_count ?? 0;
   const yesPct = total > 0 ? Math.round((yesCount / total) * 100) : 50;
   const noPct = total > 0 ? 100 - yesPct : 50;
 
@@ -145,8 +146,8 @@ export default async function DebatePage({
               />
             </div>
             <div className="mt-1.5 flex justify-between text-[11px] font-semibold text-ink-soft">
-              <span className="text-forest">YES {yesPct}%</span>
-              <span className="text-mulberry">{noPct}% NO</span>
+              <span className="text-forest">YES {yesPct}% · {yesCount} 票</span>
+              <span className="text-mulberry">{noCount} 票 · {noPct}% NO</span>
             </div>
           </div>
         ) : (

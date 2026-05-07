@@ -112,8 +112,8 @@ export function GachaponCard({ question, liked: initialLiked }: Props) {
               />
             </div>
             <div className="mt-1.5 flex justify-between text-[11px] font-semibold">
-              <span className="text-forest">YES {yesPct}%</span>
-              <span className="text-mulberry">{noPct}% NO</span>
+              <span className="text-forest">YES {yesPct}% · {yesCount} 票</span>
+              <span className="text-mulberry">{noCount} 票 · {noPct}% NO</span>
             </div>
           </div>
 

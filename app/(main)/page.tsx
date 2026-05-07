@@ -10,8 +10,9 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Strategy: prefer a random question the user hasn't voted on yet.
-  // Falls back to any published question if all have been voted.
+  // Strategy: pick a random question the user hasn't voted on yet.
+  // No fallback: if they've voted on everything, show the empty state
+  // instead of recycling questions they've already answered.
   const { data: votedRows } = await supabase
     .from("votes")
     .select("question_id")
@@ -32,22 +33,9 @@ export default async function HomePage() {
 
   const { data: candidates } = await qb;
 
-  let question = candidates && candidates.length > 0
+  const question = candidates && candidates.length > 0
     ? candidates[Math.floor(Math.random() * candidates.length)]
     : undefined;
-
-  // All voted? Just show a recent one.
-  if (!question) {
-    const { data: fallback } = await supabase
-      .from("questions")
-      .select(
-        "id, title, source, source_detail, side_a_label, side_b_label, likes_count, votes_count, yes_votes_count, no_votes_count"
-      )
-      .eq("status", "published")
-      .order("created_at", { ascending: false })
-      .limit(1);
-    question = fallback?.[0];
-  }
 
   let liked = false;
   if (question) {
@@ -79,8 +67,20 @@ export default async function HomePage() {
           {question ? (
             <GachaponCard question={question} liked={liked} />
           ) : (
-            <article className="rounded-[28px] bg-card p-10 text-center text-ink-soft ring-1 ring-border/50">
-              题库还是空的,先在 Supabase SQL editor 跑 0003_seed_sample_questions.sql。
+            <article className="rounded-[28px] bg-card p-10 text-center ring-1 ring-border/50">
+              <p className="text-2xl">🎉</p>
+              <p className="mt-3 text-sm font-semibold text-ink">
+                你投过所有题啦
+              </p>
+              <p className="mt-1 text-xs text-ink-soft">
+                等等大家提的新题被收录,或者
+                <Link
+                  href="/suggest"
+                  className="ml-1 font-semibold text-forest hover:underline"
+                >
+                  自己提一题
+                </Link>
+              </p>
             </article>
           )}
         </div>
