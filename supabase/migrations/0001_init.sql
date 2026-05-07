@@ -7,7 +7,7 @@
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
-  nickname text unique not null check (char_length(nickname) between 2 and 12),
+  nickname text unique not null check (char_length(nickname) between 2 and 50),
   avatar_url text,
   is_admin boolean default false not null,
   created_at timestamptz default now() not null

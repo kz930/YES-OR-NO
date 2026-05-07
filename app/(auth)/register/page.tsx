@@ -31,7 +31,7 @@ export default function RegisterPage() {
       setNickState({ kind: "idle" });
       return;
     }
-    if (trimmed.length < 2 || trimmed.length > 12) {
+    if (trimmed.length < 2 || trimmed.length > 50) {
       setNickState({ kind: "invalid" });
       return;
     }
@@ -91,7 +91,7 @@ export default function RegisterPage() {
       return;
     }
     if (nickState.kind === "invalid") {
-      toast.error("昵称需要 2-12 个字符");
+      toast.error("昵称需要 2-50 个字符");
       return;
     }
     if (nickState.kind === "checking") {
@@ -144,7 +144,7 @@ export default function RegisterPage() {
       case "taken":
         return { text: "✗ 已被使用", color: "text-blossom-2" };
       case "invalid":
-        return { text: "需要 2-12 字符", color: "text-blossom-2" };
+        return { text: "需要 2-50 字符", color: "text-blossom-2" };
       default:
         return null;
     }
@@ -186,8 +186,8 @@ export default function RegisterPage() {
           type="text"
           required
           minLength={2}
-          maxLength={12}
-          placeholder="2-12 个字符"
+          maxLength={50}
+          placeholder="2-50 个字符"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           disabled={loading}

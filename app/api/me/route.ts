@@ -24,8 +24,8 @@ export async function PATCH(req: NextRequest) {
 
   if (body.nickname !== undefined) {
     const trimmed = body.nickname.trim();
-    if (trimmed.length < 2 || trimmed.length > 12) {
-      return NextResponse.json({ error: "昵称需要 2-12 字" }, { status: 400 });
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      return NextResponse.json({ error: "昵称需要 2-50 字" }, { status: 400 });
     }
     update.nickname = trimmed;
   }

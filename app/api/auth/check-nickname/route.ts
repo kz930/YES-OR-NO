@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-const MAX_LEN = 12;
+const MAX_LEN = 50;
 
 function makeCandidates(base: string): string[] {
   // base + 1..9, each truncated to fit MAX_LEN total

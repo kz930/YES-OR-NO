@@ -37,8 +37,8 @@ export function ProfileEditor({
       setEditing(false);
       return;
     }
-    if (next.length < 2 || next.length > 12) {
-      toast.error("昵称需要 2-12 字");
+    if (next.length < 2 || next.length > 50) {
+      toast.error("昵称需要 2-50 字");
       return;
     }
     setSavingName(true);
@@ -145,7 +145,7 @@ export function ProfileEditor({
             <input
               value={draftName}
               onChange={(e) => setDraftName(e.target.value)}
-              maxLength={12}
+              maxLength={50}
               autoFocus
               disabled={savingName}
               className="w-full max-w-[180px] rounded-lg border border-border bg-card px-2 py-1 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-forest/50"
